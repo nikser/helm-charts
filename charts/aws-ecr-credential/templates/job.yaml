@@ -65,3 +65,11 @@ spec:
 
           patch=$( printf '{"imagePullSecrets":[{"name":"%s"}]}' "${SECRET_NAME}" )
           kubectl --namespace "${TARGET_NAMESPACE}" patch serviceaccount "${SERVICE_ACCOUNT_NAME}" -p ${patch}
+
+          SECRET_NAME='{{ .Release.Name }}-copy'
+          kubectl delete secret "${SECRET_NAME}" || true
+          kubectl create secret docker-registry "${SECRET_NAME}" \
+          --docker-server=$DOCKER_REGISTRY_SERVER \
+          --docker-username=$DOCKER_USER \
+          --docker-password=$DOCKER_PASSWORD \
+          --docker-email=no@email.local

@@ -10,10 +10,10 @@ secretName: aws-registry
 # aws.accessKeyId is the credential of a read-only user for the ECR
 # aws.secretAccessKey is the credential of a read-only user for the ECR
 aws:
-  account: "abc"
-  region: "abc"
-  accessKeyId: "abc"        # base64
-  secretAccessKey: "abc"    # base64
+  account: ""
+  region: ""
+  accessKeyId: ""        # base64
+  secretAccessKey: ""    # base64
 
 jobImage: architectminds/aws-kubectl
 jobImageTag: 1.1
