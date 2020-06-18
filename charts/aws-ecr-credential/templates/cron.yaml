@@ -41,10 +41,18 @@ spec:
             - |
               AWS_ACCOUNT={{ .Values.aws.account }}
               AWS_REGION={{ .Values.aws.region }}
+              TARGET_NAMESPACE={{ .Values.targetNamespace }}
+              SERVICE_ACCOUNT_NAME={{ .Values.serviceAccountName }}
+              SECRET_NAME={{ .Values.secretName }}
+              echo "AWS_REGION=$AWS_REGION"
               echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
               echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
               echo "AWS_ACCOUNT=$AWS_ACCOUNT"
               echo "AWS_REGION=$AWS_REGION"
+              echo "TARGET_NAMESPACE=$TARGET_NAMESPACE"
+              echo "SERVICE_ACCOUNT_NAME=$SERVICE_ACCOUNT_NAME"
+              echo "SECRET_NAME=$SECRET_NAME"
+
               DOCKER_REGISTRY_SERVER=https://${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
               DOCKER_USER=AWS
               DOCKER_PASSWORD=`aws ecr get-login --region ${AWS_REGION} --registry-ids ${AWS_ACCOUNT} | cut -d' ' -f6`
@@ -53,12 +61,12 @@ spec:
               echo "DOCKER_USER=$DOCKER_USER"
               echo "DOCKER_PASSWORD=$DOCKER_PASSWORD"
 
-              kubectl delete secret --namespace {{ .Values.targetNamespace }} aws-registry || true
-              kubectl create secret --namespace {{ .Values.targetNamespace }} docker-registry aws-registry \
+              kubectl delete secret --namespace "${TARGET_NAMESPACE}" "${SECRET_NAME}" || true
+              kubectl create secret --namespace "${TARGET_NAMESPACE}" docker-registry "${SECRET_NAME}" \
               --docker-server=$DOCKER_REGISTRY_SERVER \
               --docker-username=$DOCKER_USER \
               --docker-password=$DOCKER_PASSWORD \
               --docker-email=no@email.local
 
-              kubectl patch serviceaccount default -p '{"imagePullSecrets":[{"name":"aws-registry"}]}'
-
+              patch=$( printf '{"imagePullSecrets":[{"name":"%s"}]}' "${SECRET_NAME}" )
+              kubectl --namespace "${TARGET_NAMESPACE}" patch serviceaccount "${SERVICE_ACCOUNT_NAME}" -p ${patch}

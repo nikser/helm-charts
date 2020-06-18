@@ -14,7 +14,9 @@ helm install --name aws-ecr-credential architectminds/aws-ecr-credential \
   --set aws.region=<aws region> \
   --set aws.accessKeyId=<base64> \
   --set aws.secretAccessKey=<base64> \
-  --set targetNamespace=default
+  --set targetNamespace=default \
+  --set serviceAccountName=default \
+  --set secretName=aws-registry
 ```
 
 That chart will create a secret object names `aws-registry`.
